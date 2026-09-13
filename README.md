@@ -2,6 +2,7 @@
 
 > **多 Agent 协作的智能运维助手** — 用自然语言描述运维需求，AI 自动生成命令、分析日志、编写脚本。
 
+[![Tests](https://github.com/oixiao/cloudops-ai-helper/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/oixiao/cloudops-ai-helper/actions/workflows/test.yml)
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111+-green.svg)](https://fastapi.tiangolo.com/)
 [![Docker](https://img.shields.io/badge/Docker-ready-blue.svg)](https://www.docker.com/)
