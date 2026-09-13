@@ -1,0 +1,61 @@
+# ===========================================
+# CloudOps AI Helper - .gitignore
+# ===========================================
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.coverage.*
+
+# Data
+data/
+*.db
+*.sqlite3
+
+# Logs
+logs/
+*.log
+*.err
+*.out
+nohup.out
+
+# 本地启动脚本产生的运行日志（含本机路径，不应提交）
+server_run.*
+run.log
+start.log
+
+# Docker
+docker-compose.override.yml

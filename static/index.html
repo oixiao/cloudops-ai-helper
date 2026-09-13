@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudOps AI 运维助手 · 智能运维控制台</title>
+
+    <!-- 字体：Chakra Petch 科技几何体（标题） + Outfit（正文） + Zen Maru Gothic（中日文圆润） + JetBrains Mono（代码） -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Outfit:wght@400;500;600&family=Zen+Maru+Gothic:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5：仅保留 Tab 切换与图标能力 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <!-- 主样式表 -->
+    <link rel="stylesheet" href="/static/css/cloudops.css">
+</head>
+<body>
+
+<div class="shell">
+
+    <!-- ==================== 顶部状态栏 ==================== -->
+    <header class="topbar reveal reveal-1">
+        <a class="brand" href="/">
+            <span class="brand-mark">☁️</span>
+            <span class="brand-text">
+                <span class="brand-name">CloudOps AI</span>
+                <span class="brand-sub">Ops Console</span>
+            </span>
+        </a>
+
+        <div class="topbar-right">
+            <span class="status-pill" id="statusIndicator">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">检查中</span>
+            </span>
+            <a href="/static/orchestrate.html" class="console-link">
+                <i class="bi bi-diagram-3"></i> 协作工作台
+            </a>
+        </div>
+    </header>
+
+    <!-- ==================== 主标题区 ==================== -->
+    <section class="hero reveal reveal-2">
+        <div class="hero-eyebrow">Intelligent Ops Assistant</div>
+        <h1>自然语言驱动的<em>智能运维</em>控制台<span class="cursor-block"></span></h1>
+        <p>用一句话描述运维需求，自动生成 Linux 命令、分析日志异常、编写修复脚本。</p>
+    </section>
+
+    <!-- ==================== 功能切换 ==================== -->
+    <ul class="nav nav-tabs tab-rail reveal reveal-3" id="mainTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link tab-btn active" id="cmd-tab" data-bs-toggle="tab" data-bs-target="#cmdPanel" type="button">
+                <span class="tab-idx">01</span> 命令生成
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link tab-btn" id="log-tab" data-bs-toggle="tab" data-bs-target="#logPanel" type="button">
+                <span class="tab-idx">02</span> 日志分析
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link tab-btn" id="script-tab" data-bs-toggle="tab" data-bs-target="#scriptPanel" type="button">
+                <span class="tab-idx">03</span> 脚本生成
+            </button>
+        </li>
+    </ul>
+
+    <!-- ==================== 面板内容 ==================== -->
+    <div class="tab-content reveal reveal-4">
+
+        <!-- ---------- 01 命令生成 ---------- -->
+        <div class="tab-pane fade show active" id="cmdPanel">
+            <div class="work-grid">
+
+                <!-- 输入侧 -->
+                <div class="term term-input">
+                    <div class="term-bar">
+                        <span class="term-title">输入 · 运维需求</span>
+                    </div>
+                    <div class="term-body">
+                        <div class="field">
+                            <label class="field-label" for="cmdInput">Description</label>
+                            <textarea id="cmdInput" class="input-area" rows="5"
+                                placeholder="描述你的运维需求，例如：查看磁盘使用情况、查找大于100MB的文件、检查端口监听情况..."></textarea>
+                        </div>
+
+                        <div class="chips">
+                            <span class="chips-label">快捷</span>
+                            <span class="chip" onclick="fillExample('cmd', '查看磁盘使用情况')">磁盘使用</span>
+                            <span class="chip" onclick="fillExample('cmd', '查看所有进程按内存排序')">进程查看</span>
+                            <span class="chip" onclick="fillExample('cmd', '检查端口监听情况')">端口检查</span>
+                            <span class="chip" onclick="fillExample('cmd', '查找大于100MB的文件')">大文件查找</span>
+                            <span class="chip" onclick="fillExample('cmd', '杀掉nginx进程')">杀进程</span>
+                        </div>
+
+                        <button class="btn-run" onclick="generateCmd()" id="cmdBtn">
+                            <i class="bi bi-lightning-charge-fill"></i> 生成命令
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 输出侧 -->
+                <div class="term">
+                    <div class="term-bar">
+                        <span class="term-title">输出 · 生成结果</span>
+                        <button class="btn-copy" onclick="copyResult('cmdResult')" id="cmdCopyBtn" style="display:none;">
+                            <i class="bi bi-clipboard"></i> 复制
+                        </button>
+                    </div>
+                    <div class="term-body">
+                        <div id="cmdLoading" class="loading" style="display:none;">
+                            <span class="spinner-custom"></span>
+                            <span class="loading-text">正在生成命令</span>
+                        </div>
+
+                        <div id="cmdEmpty" class="out-empty">
+                            <span class="out-empty-icon">⌘</span>
+                            <span class="out-empty-hint">在左侧描述需求，然后生成命令</span>
+                        </div>
+
+                        <div id="cmdResult" style="display:none;">
+                            <div class="out-section mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="out-label">Command</span>
+                                    <span id="cmdSafety" class="badge"></span>
+                                </div>
+                                <div class="code-out" id="cmdCommand"></div>
+                            </div>
+                            <div class="out-section">
+                                <span class="out-label">Explanation</span>
+                                <p class="out-text" id="cmdExplanation"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ---------- 02 日志分析 ---------- -->
+        <div class="tab-pane fade" id="logPanel">
+            <div class="work-grid">
+
+                <div class="term term-input">
+                    <div class="term-bar">
+                        <span class="term-title is-amber">输入 · 日志内容</span>
+                    </div>
+                    <div class="term-body">
+                        <div class="field">
+                            <label class="field-label" for="logInput">Raw Log</label>
+                            <textarea id="logInput" class="input-area" rows="7"
+                                placeholder="粘贴日志内容，例如：&#10;2024-06-01 ERROR Database connection timeout&#10;Out of memory: Kill process 12345 (java)..."></textarea>
+                        </div>
+
+                        <div class="chips">
+                            <span class="chips-label">快捷</span>
+                            <span class="chip" onclick="fillExample('log', '2024-06-01 ERROR Connection refused: connect to 10.0.0.1:3306')">连接拒绝</span>
+                            <span class="chip" onclick="fillExample('log', 'Out of memory: Kill process 12345 (java)')">OOM</span>
+                            <span class="chip" onclick="fillExample('log', 'ERROR Permission denied: /etc/nginx/nginx.conf')">权限拒绝</span>
+                            <span class="chip" onclick="fillExample('log', '192.168.1.1 - - [01/Jun/2024:10:00:00 +0000] GET /api HTTP/1.1 500 1234')">Nginx 500</span>
+                        </div>
+
+                        <button class="btn-run" onclick="analyzeLog()" id="logBtn">
+                            <i class="bi bi-search"></i> 分析日志
+                        </button>
+                    </div>
+                </div>
+
+                <div class="term">
+                    <div class="term-bar">
+                        <span class="term-title is-amber">输出 · 分析结果</span>
+                    </div>
+                    <div class="term-body">
+                        <div id="logLoading" class="loading" style="display:none;">
+                            <span class="spinner-custom"></span>
+                            <span class="loading-text">正在分析日志</span>
+                        </div>
+
+                        <div id="logEmpty" class="out-empty">
+                            <span class="out-empty-icon">⌘</span>
+                            <span class="out-empty-hint">在左侧粘贴日志，然后开始分析</span>
+                        </div>
+
+                        <div id="logResult" style="display:none;">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span id="logLevel" class="badge"></span>
+                                <span id="logType" class="text-muted" style="font-family: var(--mono); font-size: 12px;"></span>
+                            </div>
+
+                            <div class="out-section mb-3">
+                                <span class="out-label">Summary</span>
+                                <p class="out-text" id="logSummary"></p>
+                            </div>
+
+                            <div class="out-section mb-3">
+                                <span class="out-label">Troubleshooting Steps</span>
+                                <ol class="step-list mt-1" id="logSteps"></ol>
+                            </div>
+
+                            <div class="out-section">
+                                <span class="out-label">Confidence</span>
+                                <p class="out-text" style="font-family: var(--mono); font-size: 12.5px;">
+                                    <span id="logConfidence"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ---------- 03 脚本生成 ---------- -->
+        <div class="tab-pane fade" id="scriptPanel">
+            <div class="work-grid">
+
+                <div class="term term-input">
+                    <div class="term-bar">
+                        <span class="term-title">输入 · 脚本需求</span>
+                    </div>
+                    <div class="term-body">
+                        <div class="field">
+                            <label class="field-label" for="scriptInput">Requirement</label>
+                            <textarea id="scriptInput" class="input-area" rows="5"
+                                placeholder="描述你需要的运维脚本，例如：备份MySQL数据库并压缩、监控CPU使用率超80%发送告警..."></textarea>
+                        </div>
+
+                        <div class="chips">
+                            <span class="chips-label">快捷</span>
+                            <span class="chip" onclick="fillExample('script', '备份MySQL数据库并压缩')">数据库备份</span>
+                            <span class="chip" onclick="fillExample('script', '清理7天前的日志文件')">日志清理</span>
+                            <span class="chip" onclick="fillExample('script', 'nginx服务挂了自动重启')">服务监控</span>
+                            <span class="chip" onclick="fillExample('script', '监控CPU和内存使用率')">资源监控</span>
+                        </div>
+
+                        <button class="btn-run" onclick="generateScript()" id="scriptBtn">
+                            <i class="bi bi-file-earmark-code"></i> 生成脚本
+                        </button>
+                    </div>
+                </div>
+
+                <div class="term">
+                    <div class="term-bar">
+                        <span class="term-title">输出 · 生成结果</span>
+                        <button class="btn-copy" onclick="copyResult('scriptCode')" id="scriptCopyBtn" style="display:none;">
+                            <i class="bi bi-clipboard"></i> 复制
+                        </button>
+                    </div>
+                    <div class="term-body">
+                        <div id="scriptLoading" class="loading" style="display:none;">
+                            <span class="spinner-custom"></span>
+                            <span class="loading-text">正在生成脚本</span>
+                        </div>
+
+                        <div id="scriptEmpty" class="out-empty">
+                            <span class="out-empty-icon">⌘</span>
+                            <span class="out-empty-hint">在左侧描述脚本需求，然后生成</span>
+                        </div>
+
+                        <div id="scriptResult" style="display:none;">
+                            <div class="out-section mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="out-label">Script</span>
+                                    <span id="scriptLang" class="badge bg-info"></span>
+                                </div>
+                                <div class="code-out is-script" id="scriptCode"></div>
+                            </div>
+
+                            <div class="out-section mb-2">
+                                <span class="out-label">Usage</span>
+                                <p class="out-text" id="scriptDesc"></p>
+                            </div>
+
+                            <div id="scriptWarnings"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ==================== 底部信息 ==================== -->
+    <footer class="foot reveal reveal-5">
+        <span>CloudOps AI · 运维辅助工具 · 所有生成结果请在执行前人工确认</span>
+        <span class="foot-stack">
+            <span class="foot-tag">FastAPI</span>
+            <span class="foot-tag">多 Agent 协作</span>
+            <span class="foot-tag">多模型降级</span>
+            <span class="foot-tag">Pytest 84 用例</span>
+        </span>
+    </footer>
+
+</div>
+
+<!-- Bootstrap JS：提供 Tab 切换 -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

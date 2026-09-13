@@ -1,0 +1,665 @@
+/* ============================================================
+   CloudOps AI — 多 Agent 协作工作台 样式
+   设计语言与主控制台保持一致：深夜机房监控终端 × 初音未来配色
+   —— 深蓝黑底 + 初音绿 + 樱花粉点缀 + 科技几何字体 + 全息霓虹
+   ============================================================ */
+
+/* ==================== 设计令牌（与主页面同源） ==================== */
+:root {
+    --bg-void: #05080e;
+    --bg-deep: #091019;
+    --bg-panel: #0d1822;
+    --bg-raised: #132330;
+    --bg-inset: #040710;
+
+    /* 主色：初音绿（#39C5BB） */
+    --acc: #39c5bb;
+    --acc-lite: #5ee8dd;
+    --acc-dim: #1f8b84;
+    --acc-glow: rgba(57, 197, 187, 0.38);
+    --acc-soft: rgba(57, 197, 187, 0.09);
+
+    /* 点缀色：樱花粉 */
+    --pink: #ff6fa5;
+    --pink-soft: rgba(255, 111, 165, 0.1);
+    --pink-glow: rgba(255, 111, 165, 0.34);
+
+    --amber: #ffb02e;
+    --amber-soft: rgba(255, 176, 46, 0.1);
+    --danger: #ff5f7a;
+    --danger-soft: rgba(255, 95, 122, 0.1);
+    --cyan: #4fd6e8;
+    --cyan-soft: rgba(79, 214, 232, 0.1);
+
+    --fg: #dcecf2;
+    --fg-mute: #7f9aa8;
+    --fg-dim: #4b6373;
+
+    --line: rgba(96, 152, 170, 0.18);
+    --line-strong: rgba(96, 152, 170, 0.32);
+
+    --mono: 'JetBrains Mono', 'IBM Plex Mono', 'Cascadia Code', 'SF Mono', Consolas, 'Courier New', monospace;
+    --sans: 'Outfit', 'Zen Maru Gothic', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    --display: 'Chakra Petch', 'Zen Maru Gothic', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+
+    --notch: 14px;
+    --ease: cubic-bezier(0.22, 0.8, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background-color: var(--bg-void);
+    background-image:
+        linear-gradient(180deg, rgba(57, 197, 187, 0.06) 0%, transparent 260px),
+        radial-gradient(900px 520px at 10% -8%, rgba(57, 197, 187, 0.1), transparent 70%),
+        radial-gradient(760px 520px at 94% 6%, rgba(255, 111, 165, 0.07), transparent 70%),
+        radial-gradient(600px 400px at 50% 100%, rgba(57, 197, 187, 0.04), transparent 70%);
+    background-attachment: fixed;
+    color: var(--fg);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* 网格底纹 + 扫描线：机房监控屏质感 */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+        linear-gradient(rgba(96, 152, 170, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(96, 152, 170, 0.045) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, #000 20%, transparent 85%);
+    -webkit-mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, #000 20%, transparent 85%);
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: repeating-linear-gradient(
+        180deg,
+        transparent 0px,
+        transparent 2px,
+        rgba(0, 0, 0, 0.16) 3px,
+        transparent 4px
+    );
+    opacity: 0.5;
+}
+
+.app-container {
+    position: relative;
+    z-index: 1;
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 28px 20px 64px;
+}
+
+/* ==================== 顶部栏 ==================== */
+.top-bar {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 4px 0 24px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 32px;
+}
+
+.top-bar .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    align-self: flex-start;
+    padding: 6px 13px;
+    border: 1px solid var(--line-strong);
+    border-radius: 5px;
+    color: var(--fg-mute);
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    transition: all 0.2s var(--ease);
+}
+
+.top-bar .back-link:hover {
+    color: var(--acc);
+    border-color: var(--acc-dim);
+    background: var(--acc-soft);
+}
+
+.top-bar h1 {
+    font-family: var(--display);
+    font-size: clamp(22px, 3.4vw, 32px);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #fff;
+    line-height: 1.2;
+}
+
+/* 标题后半段光标装饰：初音绿 → 粉 渐变 */
+.top-bar h1::after {
+    content: '';
+    display: inline-block;
+    width: 0.42em;
+    height: 0.86em;
+    margin-left: 8px;
+    background: linear-gradient(180deg, var(--acc), var(--pink));
+    vertical-align: -0.05em;
+    animation: blink 1.15s step-end infinite;
+    box-shadow: 0 0 18px var(--acc-glow);
+}
+
+.top-bar .subtitle {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--fg-dim);
+}
+
+/* ==================== 任务输入区 ==================== */
+.input-section { margin-bottom: 34px; }
+
+.input-card {
+    position: relative;
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-radius: var(--notch) 4px var(--notch) 4px;
+    padding: 22px;
+    transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+
+.input-card:focus-within {
+    border-color: rgba(57, 197, 187, 0.28);
+    box-shadow: 0 0 0 1px rgba(57, 197, 187, 0.08), 0 18px 44px rgba(0, 0, 0, 0.4);
+}
+
+.input-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.input-header .label {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg-mute);
+}
+
+.input-header .label::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--acc);
+    border-radius: 1px;
+    box-shadow: 0 0 8px var(--acc-glow);
+}
+
+.input-header .hint {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--fg-dim);
+}
+
+.task-input {
+    width: 100%;
+    min-height: 116px;
+    background: var(--bg-inset);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--fg);
+    padding: 15px 16px;
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.7;
+    resize: vertical;
+    transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s var(--ease);
+}
+
+.task-input:focus {
+    outline: none;
+    border-color: var(--acc-dim);
+    background: #08100d;
+    box-shadow: 0 0 0 3px rgba(57, 197, 187, 0.08);
+}
+
+.task-input::placeholder { color: var(--fg-dim); }
+
+.input-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.examples {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.example-tag {
+    padding: 5px 12px;
+    background: transparent;
+    border: 1px dashed var(--line-strong);
+    border-radius: 5px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--fg-mute);
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.18s var(--ease);
+}
+
+.example-tag:hover {
+    color: var(--acc);
+    border-color: var(--acc-dim);
+    border-style: solid;
+    background: var(--acc-soft);
+}
+
+.example-tag:active { transform: scale(0.97); }
+
+/* 主按钮：与主控制台一致的初音双色渐变 */
+.submit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 13px 30px;
+    background: linear-gradient(96deg, var(--acc) 0%, var(--acc-lite) 62%, var(--pink) 100%);
+    border: none;
+    border-radius: 7px;
+    color: #04120f;
+    font-family: var(--display);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s var(--ease);
+    box-shadow: 0 4px 20px rgba(57, 197, 187, 0.2);
+}
+
+.submit-btn:hover:not(:disabled) {
+    background: linear-gradient(96deg, var(--acc-lite) 0%, #6ff0e4 55%, #ff85b4 100%);
+    box-shadow: 0 6px 34px rgba(57, 197, 187, 0.42), 0 0 22px rgba(255, 111, 165, 0.24);
+    transform: translateY(-1px);
+}
+
+.submit-btn:active:not(:disabled) { transform: translateY(0); }
+
+.submit-btn:disabled {
+    background: var(--bg-raised);
+    color: var(--fg-mute);
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* ==================== 区块标题 ==================== */
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--fg-mute);
+    margin-bottom: 16px;
+}
+
+.section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+}
+
+/* ==================== Agent 状态卡片 ==================== */
+.agents-section { margin-bottom: 34px; }
+
+.agent-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.agent-card {
+    position: relative;
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--line-strong);
+    border-radius: 10px 3px 10px 3px;
+    padding: 20px 14px 16px;
+    text-align: center;
+    overflow: hidden;
+    transition: all 0.3s var(--ease);
+}
+
+/* 卡片底部微光，running 时点亮 */
+.agent-card::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--line-strong);
+    transition: background 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+
+.agent-card .agent-icon {
+    font-size: 26px;
+    line-height: 1;
+    margin-bottom: 10px;
+    filter: grayscale(0.35);
+    transition: filter 0.3s var(--ease), transform 0.3s var(--ease);
+}
+
+.agent-card .agent-name {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 13.5px;
+    letter-spacing: 0.02em;
+    color: #fff;
+    margin-bottom: 3px;
+}
+
+.agent-card .agent-role {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+    margin-bottom: 12px;
+}
+
+.agent-card .agent-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 11px;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+    border: 1px solid transparent;
+    transition: all 0.3s var(--ease);
+}
+
+.agent-card .agent-task {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    line-height: 1.5;
+    color: var(--fg-dim);
+    min-height: 18px;
+    word-break: break-word;
+}
+
+/* ---- 状态配色 ---- */
+.agent-status.idle {
+    background: rgba(125, 148, 154, 0.1);
+    color: var(--fg-mute);
+    border-color: var(--line);
+}
+
+.agent-status.pending {
+    background: var(--amber-soft);
+    color: var(--amber);
+    border-color: rgba(255, 176, 46, 0.28);
+}
+
+.agent-status.running {
+    background: var(--cyan-soft);
+    color: var(--cyan);
+    border-color: rgba(79, 214, 232, 0.3);
+}
+
+.agent-status.done {
+    background: var(--acc-soft);
+    color: var(--acc);
+    border-color: rgba(57, 197, 187, 0.3);
+}
+
+.agent-status.failed {
+    background: var(--danger-soft);
+    color: var(--danger);
+    border-color: rgba(255, 87, 87, 0.3);
+}
+
+/* ---- 卡片运行状态 ---- */
+.agent-card.running {
+    border-color: rgba(79, 214, 232, 0.4);
+    border-top-color: var(--cyan);
+    background: linear-gradient(180deg, rgba(79, 214, 232, 0.06), transparent 70%);
+    animation: card-pulse 1.9s var(--ease) infinite;
+}
+
+.agent-card.running::after {
+    background: var(--cyan);
+    box-shadow: 0 0 16px var(--cyan);
+}
+
+.agent-card.running .agent-icon {
+    filter: none;
+    transform: scale(1.06);
+}
+
+.agent-card.done {
+    border-color: rgba(57, 197, 187, 0.28);
+    border-top-color: var(--acc);
+}
+
+.agent-card.done::after {
+    background: var(--acc);
+    box-shadow: 0 0 12px var(--acc-glow);
+}
+
+.agent-card.done .agent-icon { filter: none; }
+
+.agent-card.failed {
+    border-color: rgba(255, 87, 87, 0.35);
+    border-top-color: var(--danger);
+}
+
+.agent-card.failed::after {
+    background: var(--danger);
+    box-shadow: 0 0 12px rgba(255, 87, 87, 0.5);
+}
+
+@keyframes card-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(79, 214, 232, 0.22); }
+    50% { box-shadow: 0 0 0 8px rgba(79, 214, 232, 0); }
+}
+
+/* ==================== 执行日志 ==================== */
+.log-section { margin-bottom: 34px; }
+
+.log-panel {
+    position: relative;
+    max-height: 300px;
+    overflow-y: auto;
+    background: var(--bg-inset);
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--acc-dim);
+    border-radius: 4px 10px 10px 4px;
+    padding: 16px 18px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.85;
+}
+
+.log-entry {
+    display: flex;
+    gap: 9px;
+    padding: 2px 0;
+    animation: log-in 0.32s var(--ease);
+}
+
+.log-entry .time {
+    color: var(--acc-dim);
+    white-space: nowrap;
+    flex: none;
+}
+
+.log-entry .agent-tag {
+    color: var(--cyan);
+    font-weight: 700;
+    white-space: nowrap;
+    flex: none;
+}
+
+.log-entry .message { color: var(--fg); }
+
+.log-entry.placeholder .time,
+.log-entry.placeholder .agent-tag,
+.log-entry.placeholder .message { color: var(--fg-dim); }
+
+@keyframes log-in {
+    from { opacity: 0; transform: translateX(-6px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* ==================== 诊断报告 ==================== */
+.report-section { margin-bottom: 34px; }
+
+.report-card {
+    position: relative;
+    background: var(--bg-panel);
+    border: 1px solid rgba(57, 197, 187, 0.22);
+    border-radius: var(--notch) 4px var(--notch) 4px;
+    padding: 26px;
+    box-shadow: 0 0 0 1px rgba(57, 197, 187, 0.05), 0 20px 50px rgba(0, 0, 0, 0.35);
+    animation: report-in 0.5s var(--ease);
+}
+
+/* 报告卡片左上角的绿色标记条 */
+.report-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 42px;
+    background: var(--acc);
+    border-radius: var(--notch) 0 0 0;
+    box-shadow: 0 0 16px var(--acc-glow);
+}
+
+@keyframes report-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.report-content {
+    color: var(--fg);
+    line-height: 1.85;
+    font-size: 14.5px;
+}
+
+.report-content strong {
+    color: #fff;
+    font-weight: 600;
+}
+
+.report-content h2 {
+    font-family: var(--mono);
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    color: var(--acc);
+    margin: 20px 0 10px;
+}
+
+.report-content h2:first-child { margin-top: 0; }
+
+.report-content ul,
+.report-content ol { padding-left: 22px; }
+
+.report-content li { margin: 5px 0; }
+
+.report-content code {
+    background: var(--acc-soft);
+    border: 1px solid rgba(57, 197, 187, 0.2);
+    color: var(--acc);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+}
+
+.report-content pre {
+    background: var(--bg-inset);
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--acc-dim);
+    padding: 14px 16px;
+    border-radius: 4px 8px 8px 4px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 12.5px;
+}
+
+/* ==================== 关键帧 ==================== */
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* ==================== 滚动条 ==================== */
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: var(--bg-inset); }
+::-webkit-scrollbar-thumb {
+    background: var(--bg-raised);
+    border-radius: 5px;
+    border: 2px solid var(--bg-inset);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--acc-dim); }
+
+/* ==================== 响应式 ==================== */
+@media (max-width: 900px) {
+    .agent-cards { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+    .app-container { padding: 20px 16px 52px; }
+    .top-bar { margin-bottom: 26px; }
+    .input-footer { flex-direction: column; align-items: stretch; }
+    .submit-btn { width: 100%; }
+    .examples { justify-content: flex-start; }
+}
+
+@media (max-width: 420px) {
+    .agent-cards { grid-template-columns: 1fr; }
+}
+
+/* ==================== 动效偏好 ==================== */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

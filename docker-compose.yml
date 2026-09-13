@@ -1,0 +1,66 @@
+# ============================================
+# CloudOps AI Helper — Docker Compose
+# ============================================
+
+version: "3.9"
+
+services:
+  cloudops-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cloudops-api
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=false
+      - DATABASE_URL=sqlite:///./data/cloudops.db
+      # AI模型密钥（从.env文件加载）
+      - ARK_API_KEY=${ARK_API_KEY:-}
+      - ARK_BASE_URL=${ARK_BASE_URL:-https://ark.cn-beijing.volces.com/api/v3}
+      - ARK_MODEL_ID=${ARK_MODEL_ID:-}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-}
+      - OLLAMA_MODEL_ID=${OLLAMA_MODEL_ID:-qwen2:7b}
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./static:/app/static
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - cloudops-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Redis（可选，用于缓存和限流）
+  redis:
+    image: redis:7-alpine
+    container_name: cloudops-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - cloudops-network
+    profiles:
+      - full
+
+networks:
+  cloudops-network:
+    driver: bridge
+
+volumes:
+  redis_data:
