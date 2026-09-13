@@ -84,7 +84,7 @@ python scripts/security_check.py
 
 ```bash
 # 1. 克隆项目
-git clone https://github.com/csf2005314/cloudops-ai-helper.git
+git clone https://github.com/oixiao/cloudops-ai-helper.git
 cd cloudops-ai-helper
 
 # 2. 创建虚拟环境
